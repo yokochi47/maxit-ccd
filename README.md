@@ -8,7 +8,7 @@ First, pull the Docker image from the GitHub Container Repository
 docker pull ghcr.io/yokochi47/maxit-ccd:main
 ```
 
-Then, run the image with memory limit (e.g. 16GB, no swap)
+Then, run the image with memory limit (e.g. 16GB, no swap) that prevents large amounts of memory being required when converting malformed PDB file
 ```shell
 docker run -m 16g --memory-swap 16g ghcr.io/yokochi47/maxit-ccd:main -input inputfile -output outputfile -o num [ -log logfile ]
 ```

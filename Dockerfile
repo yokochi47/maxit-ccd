@@ -32,7 +32,7 @@ RUN set -eux; \
     cd "${RCSBROOT}"; \
     export RCSBROOT; \
     ASCII_DIR="data/ascii"; \
-    # update dectionary definition language (DDL)
+    # update Dictionary Definition Language (DDL)
     MMCIF_URL="https://mmcif.wwpdb.org/dictionaries/ascii"; \
     DDL_TARBALL="mmcif_ddl.dic.gz"; \
     DDL_URL="${MMCIF_URL}/${DDL_TARBALL}"; \
@@ -41,7 +41,7 @@ RUN set -eux; \
     wget -q "${DDL_URL}" \
     && gzip -d "${DDL_TARBALL}" -c > "${DDL_LOC}" \
     && rm "${DDL_TARBALL}"; \
-    # update PDBx/mmCIF dictionary
+    # update PDBx/mmCIF Dictionary
     DIC_TARBALL="mmcif_pdbx_v50.dic.gz"; \
     DIC_URL="${MMCIF_URL}/${DIC_TARBALL}"; \
     DIC_LOC="${ASCII_DIR}/mmcif_pdbx.dic"; \
@@ -49,7 +49,7 @@ RUN set -eux; \
     wget -q "${DIC_URL}" \
     && gzip -d "${DIC_TARBALL}" -c > "${DIC_LOC}" \
     && rm "${DIC_TARBALL}"; \
-    # update chemical component dictionary (CCD)
+    # update Chemical Component Dictionary (CCD)
     FILES_URL="https://files.wwpdb.org/pub/pdb/data/monomers"; \
     COMPONENTS_TARBALL="components.cif.gz"; \
     COMPONENTS_URL="${FILES_URL}/${COMPONENTS_TARBALL}"; \
@@ -58,7 +58,7 @@ RUN set -eux; \
     wget -q "${COMPONENTS_URL}" \
     && gzip -d "${COMPONENTS_TARBALL}" -c > "${COMPONENTS_LOC}" \
     && rm "${COMPONENTS_TARBALL}"; \
-    # update variants dictionary
+    # update Protonation Variants Companion Dictionary
     VARIANTS_TARBALL="aa-variants-v1.cif.gz"; \
     VARIANTS_URL="${FILES_URL}/${VARIANTS_TARBALL}"; \
     VARIANTS_LOC="${ASCII_DIR}/variant.cif"; \
@@ -111,4 +111,3 @@ RUN chmod +x /usr/local/bin/maxit-wrapper
 
 ENTRYPOINT ["/usr/local/bin/maxit-wrapper"]
 CMD ["-h"]
-

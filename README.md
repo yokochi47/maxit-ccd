@@ -15,7 +15,7 @@ docker run -m 16g --memory-swap 16g ghcr.io/yokochi47/maxit-ccd:main -input inpu
 
 Or, run 'maxit' alias command
 ```shell
-alias maxit='docker -m 16g --memory-swap 16g run ghcr.io/yokochi47/maxit-ccd:main'
+alias maxit='docker run -m 16g --memory-swap 16g ghcr.io/yokochi47/maxit-ccd:main'
 
 maxit -input inputfile -output outputfile -o num [ -log logfile ]
 ```

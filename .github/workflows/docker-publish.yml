@@ -104,5 +104,5 @@ jobs:
       - name: Deploy to self-hosted servers
         shell: bash
         run: |
-          docker rmi ${{ IMAGE_NAME }}:main
-          docker pull ${{ IMAGE_NAME }}:main
+          docker rmi ${{ env.IMAGE_NAME }}:main
+          docker pull ${{ env.IMAGE_NAME }}:main

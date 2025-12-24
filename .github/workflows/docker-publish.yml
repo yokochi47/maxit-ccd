@@ -92,5 +92,4 @@ jobs:
       - name: Deploy to self-hosted servers
         shell: bash
         run: |
-          docker rmi ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }} || true
           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}

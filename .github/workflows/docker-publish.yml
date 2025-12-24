@@ -96,6 +96,8 @@ jobs:
           docker system info | grep Swarm | grep active > /dev/null || docker swarm init
           docker service ps ${{ github.event.repository.name }} > /dev/null \
             && ((docker service update --force --quiet --image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }} ${{ github.event.repository.name }} \
-                || (docker rmi $(docker images --quiet --filter "dangling=true" ${{ env.IMAGE_NAME }}) || true)) &) \
+                || ([`docker images --quiet --filter "dangling=true" ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} | wc -l` -gt 0 ] \
+                    && docker rmi $(docker images --quiet --filter "dangling=true" ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}))) &) \
             || (docker service create --quiet --replicas 3 --name ${{ github.event.repository.name }} --update-delay 20s ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }} &)
-          sleep 60 && (docker rmi $(docker images --quiet --filter "dangling=true" ${{ env.IMAGE_NAME }}) || true)
+          sleep 60 && [`docker images --quiet --filter "dangling=true" ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} | wc -l` -gt 0 ] \
+            && docker rmi $(docker images --quiet --filter "dangling=true" ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}

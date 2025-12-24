@@ -94,8 +94,8 @@ jobs:
         run: |
           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
           docker swarm update || docker swarm init
-          docker service ls | grep ${{ github.event.repository.name }} > /dev/null \
+          docker service ps ${{ github.event.repository.name }} > /dev/null \
           && (docker service update --image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }} ${{ github.event.repository.name }} || true) \
           || docker service create --replicas 3 --name ${{ github.event.repository.name }} --update-delay 10s ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
-          docker service update
+          docker service update ${{ github.event.repository.name }}
           docker image prune -f

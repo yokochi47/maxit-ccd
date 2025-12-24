@@ -93,7 +93,7 @@ jobs:
         shell: bash
         run: |
           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
-          docker swarm update || docker swarm init
+          docker system info | grep Swarm | grep active > /dev/null && docker swarm ca > /dev/null || docker swarm init
           docker service ps ${{ github.event.repository.name }} > /dev/null \
           && (docker service update --image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }} ${{ github.event.repository.name }} > /dev/null & || true) \
           || docker service create --replicas 3 --name ${{ github.event.repository.name }} --update-delay 10s ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}

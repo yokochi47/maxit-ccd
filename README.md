@@ -1,5 +1,5 @@
 # maxit-ccd
-A Docker image repository for [MAXIT](https://sw-tools.rcsb.org/apps/MAXIT/), containing regularly updated wwPDB's resources, in particular [PDBx/mmCIF Dictionary](https://mmcif.wwpdb.org/) and [Chemical Component Dictionary (CCD)](https://www.wwpdb.org/data/ccd). The Docker container will be published on every Wednesday (03:10~ UTC) and deployed it to the self-hosted servers.
+A Docker image repository for [MAXIT](https://sw-tools.rcsb.org/apps/MAXIT/), containing regularly updated wwPDB's resources, in particular [PDBx/mmCIF Dictionary](https://mmcif.wwpdb.org/) and [Chemical Component Dictionary (CCD)](https://www.wwpdb.org/data/ccd). The Docker container will be published on every Wednesday (03:10~ UTC) and deployed to the self-hosted servers.
 
 ## Usage
 

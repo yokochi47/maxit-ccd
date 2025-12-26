@@ -85,11 +85,12 @@ jobs:
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+
   deploy:
     needs: build  
     runs-on: self-hosted
     steps:
-      - name: Deploy to self-hosted servers
+      - name: Deployment and rolling update to self-hosted servers
         shell: bash
         run: |
           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}

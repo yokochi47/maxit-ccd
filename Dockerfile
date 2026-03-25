@@ -1,6 +1,10 @@
 # ---- builder stage: fetch & build MAXIT from RCSB source ----
 FROM alpine:latest AS builder
 
+ARG MIN_MAXIT_VER=11.400
+ARG MIN_DDL_VER=2.3.3
+ARG MIN_PDBX_MMCIF_DIC_VER=5.411
+
 # Install tools needed to build MAXIT
 RUN apk add --no-cache \
       bash \
@@ -14,10 +18,6 @@ RUN apk add --no-cache \
 
 # Set working directory
 WORKDIR /build
-
-ENV MIN_MAXIT_VER=11.400
-ENV MIN_DDL_VER=2.3.3
-ENV MIN_PDBX_MMCIF_DIC_VER=5.411
 
 # Fetch the "latest version" marker, download corresponding tarball, extract and build.
 # The RCSB site provides 'maxit-latest-version.txt' with the version string (e.g. "11.400").

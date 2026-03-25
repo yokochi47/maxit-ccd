@@ -15,6 +15,9 @@ RUN apk add --no-cache \
 # Set working directory
 WORKDIR /build
 
+ENV MIN_DDL_VER=2.3.3
+ENV MIN_PDBX_MMCIF_DIC_VER=5.411
+
 # Fetch the "latest version" marker, download corresponding tarball, extract and build.
 # The RCSB site provides 'maxit-latest-version.txt' with the version string (e.g. "11.400").
 RUN set -eux; \
@@ -32,7 +35,7 @@ RUN set -eux; \
     cd "${RCSBROOT}"; \
     export RCSBROOT; \
     ASCII_DIR="data/ascii"; \
-    # Update Dictionary Definition Language (DDL)
+    # Update Dictionary Description Language (DDL)
     MMCIF_URL="https://mmcif.wwpdb.org/dictionaries/ascii"; \
     DDL_TARBALL="mmcif_ddl.dic.gz"; \
     DDL_URL="${MMCIF_URL}/${DDL_TARBALL}"; \
@@ -41,6 +44,10 @@ RUN set -eux; \
     wget -q "${DDL_URL}" \
     && gzip -d "${DDL_TARBALL}" -c > "${DDL_LOC}" \
     && rm "${DDL_TARBALL}"; \
+    DDL_VER=`grep _dictionary.version ${DDL_LOC}` | head -n1 | tr -s ' ' | cut -d -f2`; \
+    echo "Dectionary Description Language (DDL) Version: $DDL_VER"; \
+    if [ "$(printf '%s\n' "$MIN_DDL_VER" "$DDL_VER" | sort -V | head -n1)" = "$MIN_DDL_VER" ]; then \
+    echo "Version OK"; else exit 1; fi ; \
     # Update PDBx/mmCIF Dictionary
     DIC_TARBALL="mmcif_pdbx_v50.dic.gz"; \
     DIC_URL="${MMCIF_URL}/${DIC_TARBALL}"; \
@@ -49,6 +56,10 @@ RUN set -eux; \
     wget -q "${DIC_URL}" \
     && gzip -d "${DIC_TARBALL}" -c > "${DIC_LOC}" \
     && rm "${DIC_TARBALL}"; \
+    PDBX_MMCIF_DIC_VER=`grep _dictionary.version ${DIC_LOC}` | head -n1 | tr -s ' ' | cut -d -f2`; \
+    echo "PDBx/mmCIF Dictionary Version: $PDBX_MMCIF_DIC_VER"; \
+    if [ "$(printf '%s\n' "$MIN_PDBX_MMCIF_DIC_VER" "$PDBX_MMCIF_DIC_VER" | sort -V | head -n1)" = "$MIN_PDBX_MMCIF_DIC_VER" ]; then \
+    echo "Version OK"; else exit 1; fi ; \
     # Update Chemical Component Dictionary (CCD)
     FILES_URL="https://files.wwpdb.org/pub/pdb/data/monomers"; \
     COMPONENTS_TARBALL="components.cif.gz"; \

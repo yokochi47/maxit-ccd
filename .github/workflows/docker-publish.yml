@@ -62,7 +62,7 @@ jobs:
       # Read requirements.txt
       - name: Load required minimum versions
         run: |
-          source requrements.txt
+          source requirements.txt
           echo "MIN_MAXIT_VER=$MIN_MAXIT_VER" >> $GITHUB_ENV
           echo "MIN_DDL_VER=$MIN_DDL_VER" >> $GITHUB_ENV
           echo "MIN_PDBX_MMCIF_DIC_VER=$MIN_PDBX_MMCIF_DIC_VER" >> $GITHUB_ENV

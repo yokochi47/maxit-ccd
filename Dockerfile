@@ -15,6 +15,7 @@ RUN apk add --no-cache \
 # Set working directory
 WORKDIR /build
 
+ENV MIN_MAXIT_VER=11.400
 ENV MIN_DDL_VER=2.3.3
 ENV MIN_PDBX_MMCIF_DIC_VER=5.411
 
@@ -22,14 +23,16 @@ ENV MIN_PDBX_MMCIF_DIC_VER=5.411
 # The RCSB site provides 'maxit-latest-version.txt' with the version string (e.g. "11.400").
 RUN set -eux; \
     # Get version (e.g. "11.400") from RCSB
-    VERSION="$(wget -qO- https://sw-tools.rcsb.org/apps/MAXIT/maxit-latest-version.txt)"; \
-    echo "MAXIT version: $VERSION"; \
-    TARBALL="maxit-v${VERSION}-prod-src.tar.gz"; \
+    MAXIT_VER="$(wget -qO- https://sw-tools.rcsb.org/apps/MAXIT/maxit-latest-version.txt)" \
+    && echo "MAXIT version: $MAXIT_VER"; \
+    if [ "$(printf '%s\n' "$MIN_MAXIT_VER" "$MAXIT_VER" | sort -V | head -n1)" = "$MIN_MAXIT_VER" ]; then \
+    echo "Version OK"; else exit 1; fi; \
+    TARBALL="maxit-v${MAXIT_VER}-prod-src.tar.gz"; \
     URL="https://sw-tools.rcsb.org/apps/MAXIT/${TARBALL}"; \
     echo "Downloading ${URL} ..."; \
     wget -q "${URL}"; \
     tar -xzf "${TARBALL}"; \
-    # The tarball extracts to a directory named like "maxit-v${VERSION}-prod-src" or "maxit-v${VERSION}"
+    # The tarball extracts to a directory named like "maxit-v${MAXIT_VER}-prod-src" or "maxit-v${MAXIT_VER}"
     RCSBROOT="$(tar -tzf ${TARBALL} | head -1 | cut -f1 -d '/')"; \
     echo "Source dir: ${RCSBROOT}"; \
     cd "${RCSBROOT}"; \
@@ -44,8 +47,8 @@ RUN set -eux; \
     wget -q "${DDL_URL}" \
     && gzip -d "${DDL_TARBALL}" -c > "${DDL_LOC}" \
     && rm "${DDL_TARBALL}"; \
-    DDL_VER=$(grep _dictionary.version ${DDL_LOC} | head -n1 | tr -s ' ' | cut -d -f2); \
-    echo "Dectionary Description Language (DDL) Version: $DDL_VER"; \
+    DDL_VER="$(grep _dictionary.version ${DDL_LOC} | head -n1 | tr -s ' ' | cut -d -f2)" \
+    && echo "Dectionary Description Language (DDL) version: $DDL_VER"; \
     if [ "$(printf '%s\n' "$MIN_DDL_VER" "$DDL_VER" | sort -V | head -n1)" = "$MIN_DDL_VER" ]; then \
     echo "Version OK"; else exit 1; fi; \
     # Update PDBx/mmCIF Dictionary
@@ -56,8 +59,8 @@ RUN set -eux; \
     wget -q "${DIC_URL}" \
     && gzip -d "${DIC_TARBALL}" -c > "${DIC_LOC}" \
     && rm "${DIC_TARBALL}"; \
-    PDBX_MMCIF_DIC_VER=$(grep _dictionary.version ${DIC_LOC} | head -n1 | tr -s ' ' | cut -d -f2); \
-    echo "PDBx/mmCIF Dictionary Version: $PDBX_MMCIF_DIC_VER"; \
+    PDBX_MMCIF_DIC_VER="$(grep _dictionary.version ${DIC_LOC} | head -n1 | tr -s ' ' | cut -d -f2)" \
+    && echo "PDBx/mmCIF Dictionary version: $PDBX_MMCIF_DIC_VER"; \
     if [ "$(printf '%s\n' "$MIN_PDBX_MMCIF_DIC_VER" "$PDBX_MMCIF_DIC_VER" | sort -V | head -n1)" = "$MIN_PDBX_MMCIF_DIC_VER" ]; then \
     echo "Version OK"; else exit 1; fi; \
     # Update Chemical Component Dictionary (CCD)

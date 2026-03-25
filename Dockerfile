@@ -47,7 +47,7 @@ RUN set -eux; \
     wget -q "${DDL_URL}" \
     && gzip -d "${DDL_TARBALL}" -c > "${DDL_LOC}" \
     && rm "${DDL_TARBALL}"; \
-    DDL_VER="$(grep _dictionary.version ${DDL_LOC} | head -n1 | tr -s ' ' | cut -d -f2)" \
+    DDL_VER="$(grep _dictionary.version ${DDL_LOC} | head -n1 | tr -s ' ' | cut -d ' ' -f2)" \
     && echo "Dectionary Description Language (DDL) version: $DDL_VER"; \
     if [ "$(printf '%s\n' "$MIN_DDL_VER" "$DDL_VER" | sort -V | head -n1)" = "$MIN_DDL_VER" ]; then \
     echo "Version OK"; else exit 1; fi; \
@@ -59,7 +59,7 @@ RUN set -eux; \
     wget -q "${DIC_URL}" \
     && gzip -d "${DIC_TARBALL}" -c > "${DIC_LOC}" \
     && rm "${DIC_TARBALL}"; \
-    PDBX_MMCIF_DIC_VER="$(grep _dictionary.version ${DIC_LOC} | head -n1 | tr -s ' ' | cut -d -f2)" \
+    PDBX_MMCIF_DIC_VER="$(grep _dictionary.version ${DIC_LOC} | head -n1 | tr -s ' ' | cut -d ' ' -f2)" \
     && echo "PDBx/mmCIF Dictionary version: $PDBX_MMCIF_DIC_VER"; \
     if [ "$(printf '%s\n' "$MIN_PDBX_MMCIF_DIC_VER" "$PDBX_MMCIF_DIC_VER" | sort -V | head -n1)" = "$MIN_PDBX_MMCIF_DIC_VER" ]; then \
     echo "Version OK"; else exit 1; fi; \

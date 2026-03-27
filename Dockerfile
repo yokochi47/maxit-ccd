@@ -24,7 +24,7 @@ WORKDIR /build
 RUN set -eux; \
     # Get version (e.g. "11.400") from RCSB
     MAXIT_VER="$(wget -qO- https://sw-tools.rcsb.org/apps/MAXIT/maxit-latest-version.txt)" \
-    && echo "MAXIT version: ${MAXIT_VER}" && echo "MAXIT_VER=${MAXIT_VER}" > /build/.ver_info \
+    && echo "MAXIT version: ${MAXIT_VER}" && echo "MAXIT_VER=${MAXIT_VER}" > /build/.ver_info; \
     if [ "$(printf '%s\n' "${MIN_MAXIT_VER}" "${MAXIT_VER}" | sort -V | head -n1)" = "${MIN_MAXIT_VER}" ]; then \
     echo "Version OK"; else exit 1; fi; \
     TARBALL="maxit-v${MAXIT_VER}-prod-src.tar.gz"; \

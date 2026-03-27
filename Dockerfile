@@ -123,18 +123,8 @@ RUN echo "#!/bin/sh" > /opt/entrypoint.sh && \
     chmod +x /opt/entrypoint.sh && \
     rm -f /opt/.ver_info
 
-# Create non-root user
-RUN addgroup -S webmaster && \
-    adduser -S webmaster -G webmaster -D
-
 # Set working directory
 WORKDIR /data
-
-# Change ownership of the working directory to non-root user
-RUN chown -R webmaster:webmaster /data
-
-# Switch to no-root user
-USER webmaster
 
 # Set the entrypoint
 ENTRYPOINT ["/opt/entrypoint.sh"]

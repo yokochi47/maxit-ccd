@@ -3,19 +3,53 @@ A Docker image repository for [MAXIT](https://sw-tools.rcsb.org/apps/MAXIT/), co
 
 ## Usage
 
-Pull the container
+### Pull the container
 ```shell
 docker pull ghcr.io/yokochi47/maxit-ccd:main
 ```
 
-Then, run maxit (defined as default command of the container) with memory limit (e.g. 16GB, no swap) that will prevent large amounts of memory being required when converting malformed PDB file
+### Check software and resource version information
+You can check installed software and resource version information as environment variables.
 ```shell
-docker run -m 16g --memory-swap 16g ghcr.io/yokochi47/maxit-ccd:main -input inputfile -output outputfile -o num [ -log logfile ]
+docker run ghcr.io/yokochi47/maxit-ccd:main env
+
+MAXIT_VER=11.400     # MAXIT version
+DDL_VER=2.3.3        # Dictionary Descrition Language (DDL) version
+DIC_VER=5.412        # PDBx/mmCIF Dictionary version
+CCD_REL=2026-03-21   # Chemical Component Dictionary (CCD) release date 
+VAR_REL=2025-09-21   # Variants Companion Dictionary release date
 ```
 
-Or, run 'maxit' alias command
-```shell
-alias maxit='docker run -m 16g --memory-swap 16g ghcr.io/yokochi47/maxit-ccd:main'
-
-maxit -input inputfile -output outputfile -o num [ -log logfile ]
+### Run MAXIT command
+Here is usage of MAXIT.
 ```
+docker run ghcr.io/yokochi47/maxit-ccd:main maxit
+Usage: maxit -input inputfile -output outputfile -o num [ -log logfile ]
+  [-o  1: Translate PDB format file to CIF format file]
+  [-o  2: Translate CIF format file to PDB format file]
+  [-o  8: Translate CIF format file to mmCIF format file]
+```
+
+Next, prepare an arbitrary directory named `tmp` on the host machine to save the input file(s) `input.cif`.
+```
+tmp
+  + input.cif
+```
+
+Use `docker run -v` option to mount the `tmp` directory under the defined working directory `data` on the container machine.
+```shell
+docker run -v ./tmp:/data/tmp ghcr.io/yokochi47/maxit-ccd:main maxit -input tmp/input.cif -output tmp/output.cif -o 8 -log tmp/maxit.log
+```
+
+Finally, you will find `output.cif` and `maxit.log` files in the `tmp` directory.
+```
+tmp
+  input.cif
+  output.cif
+  maxit.log
+```
+
+To ensure a safe conversion, it is recommended to set memory limit (e.g., 16GB, no swap). This will prevent excessive memory usage when converting malformed PDB files.
+```shell
+docker run -v ./tmp:/data/tmp -m 16g --memory-swap 16g ghcr.io/yokochi47/maxit-ccd:main maxit -input tmp/input.pdb -output tmp/output.cif -o 1 -log tmp/maxit.log
+``

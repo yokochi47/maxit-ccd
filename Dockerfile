@@ -70,7 +70,7 @@ RUN set -eux; \
     COMPONENTS_LOC="${ASCII_DIR}/component.cif"; \
     echo "Downloading ${COMPONENTS_URL} ..."; \
     wget -q "${COMPONENTS_URL}" \
-    && date -r "${COMPONENTS_TARBALL}" +"%Y-%m-%d" >> /build/.ver_info \
+    && echo "CCD_VER=""$(date -r "${COMPONENTS_TARBALL}" +"%Y-%m-%d")" >> /build/.ver_info \
     && gzip -d "${COMPONENTS_TARBALL}" -c > "${COMPONENTS_LOC}" \
     && rm "${COMPONENTS_TARBALL}"; \
     # Update Protonation Variants Companion Dictionary
@@ -79,7 +79,7 @@ RUN set -eux; \
     VARIANTS_LOC="${ASCII_DIR}/variant.cif"; \
     echo "Downloading ${VARIANTS_URL} ..."; \
     wget -q "${VARIANTS_URL}" \
-    && date -r "${VARIANTS_TARBALL}" >> /build/.ver_info
+    && echo "VAR_VER=""$(date -r "${VARIANTS_TARBALL}" +"%Y-%m-%d")" >> /build/.ver_info \
     && gzip -d "${VARIANTS_TARBALL}" -c > "${VARIANTS_LOC}" \
     && rm "${VARIANTS_TARBALL}"; \
     # Build MAXIT (README-source instructs to run `make` then `make binary`)

@@ -136,7 +136,7 @@ RUN chown -R webmaster:webmaster /data
 # Switch to no-root user
 USER webmaster
 
-ENV ENV=/webmaster/.shinit
+ENV ENV=~/.shinit
 RUN cat /etc/profile >> ~/.shinit ; export ENV
 
 # Ensure the shell is interactive to load the profile

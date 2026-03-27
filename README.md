@@ -21,7 +21,7 @@ VAR_REL=2025-09-21   # Variants Companion Dictionary release date
 ```
 
 ### Run MAXIT command
-Here is usage of MAXIT.
+As you know, here's how to use MAXIT:
 ```
 docker run ghcr.io/yokochi47/maxit-ccd:main maxit
 Usage: maxit -input inputfile -output outputfile -o num [ -log logfile ]
@@ -33,15 +33,15 @@ Usage: maxit -input inputfile -output outputfile -o num [ -log logfile ]
 Next, prepare an arbitrary directory named `tmp` on the host machine to save the input file(s) `input.cif`.
 ```
 tmp
-  + input.cif
+  input.cif
 ```
 
-Use `docker run -v` option to mount the `tmp` directory under the defined working directory `data` on the container machine.
+To mount a `tmp` directory under a predefined working directory `data` on a container machine, use the `docker run -v` option.
 ```shell
 docker run -v ./tmp:/data/tmp ghcr.io/yokochi47/maxit-ccd:main maxit -input tmp/input.cif -output tmp/output.cif -o 8 -log tmp/maxit.log
 ```
 
-Finally, you will find `output.cif` and `maxit.log` files in the `tmp` directory.
+Finally, the output files `output.cif` and `maxit.log` will be created in the `tmp` directory. Conguraturation! :tada:
 ```
 tmp
   input.cif

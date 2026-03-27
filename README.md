@@ -58,4 +58,4 @@ Finally, the output files `output.cif` and `maxit.log` will be created in the `t
 To ensure a safe conversion, it is recommended to set memory limit (e.g., 16GB, no swap). This will prevent excessive memory usage when converting malformed PDB files.
 ```shell
 docker run -v ./tmp:/data/tmp -m 16g --memory-swap 16g ghcr.io/yokochi47/maxit-ccd:main maxit -input tmp/input.pdb -output tmp/output.cif -o 1 -log tmp/maxit.log
-``
+```

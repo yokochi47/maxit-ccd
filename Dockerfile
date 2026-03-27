@@ -114,14 +114,7 @@ COPY --from=builder /opt/data/binary ${RCSBROOT}/data/binary
 # Copy version information from builder
 COPY --from=builder /build/.ver_info /etc/.ver_info
 
-WORKDIR /etc
-
-# Cacatenate version information to /etc/profile
-RUN cat .ver_info profile > .profile && mv .profile profile && rm -f .ver_info
-
-ENV ENV=/etc/profile
-
-RUN export ENV
+RUN ENV=/etc/.ver_info; export ENV
 
 # Create non-root user
 RUN addgroup -S webmaster && \
@@ -133,8 +126,12 @@ WORKDIR /data
 # Change the ownership of the working directory to the non-root user
 RUN chown -R webmaster:webmaster /data
 
+SHELL ["/bin/sh", "-l", "-c"]
+
 # Switch to no-root user
 USER webmaster
+
+RUN echo -e "User : $(whoami)\nEnv  : $MAXIT_VER"
 
 # Ensure the shell is interactive to load the profile
 CMD ["/bin/sh", "-i", "-c"]

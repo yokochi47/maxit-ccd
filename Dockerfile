@@ -102,27 +102,43 @@ ENV RCSBROOT=/opt/maxit
 # Create installation directory
 RUN mkdir -p ${RCSBROOT}
 
+# Add ${RCSBROOT}/bin to PATH
+ENV PATH="$PATH:${RCSBROOT}/bin"
+
 # Copy bin directory from builder
 COPY --from=builder /opt/bin ${RCSBROOT}/bin
 
 # Copy data/binary directory from builder
 COPY --from=builder /opt/data/binary ${RCSBROOT}/data/binary
 
-# Set working directory
-WORKDIR /data
-
-# Copy version information from builder
-COPY --from=builder /build/.ver_info /opt/.ver_info
-
-# Make sh act as if it had been invoked as a login shell
-SHELL ["/bin/sh", "-l", "-c"]
-
 # Create the .shinit file with environment variables
 RUN cat /opt/.ver_info > /etc/profile; \
     rm -f /opt/.ver_info
 
-# Add ${RCSBROOT}/bin to PATH
-ENV PATH="$PATH:${RCSBROOT}/bin"
+# Make sh act as if it had been invoked as a login shell
+SHELL ["/bin/sh", "-l", "-c"]
+
+ENV ENV=/root/.shinit
+
+# Copy version information from builder
+COPY --from=builder /build/.ver_info /opt/.shinit
+
+RUN cat /opt/.shinit >> ~/.shinit
+
+# Create non-root user
+RUN addgroup -S webmaster && \
+    adduser -S webmaster -G webmaster -D
+
+# Set working directory
+WORKDIR /data
+
+# Change the ownership of the working directory to the non-root user
+RUN chown -R webmaster:webmaster /data
+
+# Switch to no-root user
+USER webmaster
+
+RUN cat /opt/.shinit >> ~/.shinit && rm -f /opt/.shinit
 
 # Ensure the shell is interactive to load the profile
 CMD ["/bin/sh", "-i", "-c"]

@@ -108,7 +108,7 @@ RUN mkdir -p ${RCSBROOT}
 COPY --from=builder /build/.ver_info ${RCSBROOT}
 
 # Add version information as environment variables: MAXIT_VER, DDL_VER, DIC_VER, CCD_VER, VAR_VER
-RUN source ${RCSBROOT}/.ver_info; \
+RUN source ${RCSBROOT}/.ver_info && export MAXIT_VER && export DDL_VER && export DIC_VER && export CCD_VER && export VAR_VER; \
     rm -f ${RCSBROOT}/.ver_info
 
 # Copy bin directory from builder

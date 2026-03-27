@@ -114,7 +114,7 @@ COPY --from=builder /opt/data/binary ${RCSBROOT}/data/binary
 # Copy version information from builder
 COPY --from=builder /build/.ver_info /opt/.ver_info
 
-# Create entrypoint script executable
+# Create entrypoint script executable with exporting version information
 RUN echo "#!/bin/sh" > /opt/entrypoint.sh && \
     echo "set -e" >> /opt/entrypoint.sh && \
     cat /opt/.ver_info >> /opt/entrypoint.sh && \
@@ -125,6 +125,12 @@ RUN echo "#!/bin/sh" > /opt/entrypoint.sh && \
 # Create non-root user
 RUN addgroup -S webmaster && \
     adduser -S webmaster -G webmaster -D
+
+# Set working directory
+WORKDIR /data
+
+# Change ownership of the working directory to non-root user
+RUN chown -R webmaster:webmaster /data
 
 # Switch to no-root user
 USER webmaster

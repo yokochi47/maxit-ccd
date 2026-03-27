@@ -3,7 +3,7 @@ FROM alpine:latest AS builder
 
 ARG MIN_MAXIT_VER=11.400
 ARG MIN_DDL_VER=2.3.3
-ARG MIN_PDBX_MMCIF_DIC_VER=5.411
+ARG DIC_VER=5.412
 
 # Install tools needed to build MAXIT
 RUN apk add --no-cache \
@@ -59,9 +59,9 @@ RUN set -eux; \
     wget -q "${DIC_URL}" \
     && gzip -d "${DIC_TARBALL}" -c > "${DIC_LOC}" \
     && rm "${DIC_TARBALL}"; \
-    PDBX_MMCIF_DIC_VER="$(grep _dictionary.version ${DIC_LOC} | head -n1 | tr -s ' ' | cut -d ' ' -f2)" \
-    && echo "PDBx/mmCIF Dictionary version: ${PDBX_MMCIF_DIC_VER}" && echo "PDBX_MMCIF_DIC_VER=${PDBX_MMCIF_DIC_VER}" >> /build/.ver_info; \
-    if [ "$(printf '%s\n' "${MIN_PDBX_MMCIF_DIC_VER}" "${PDBX_MMCIF_DIC_VER}" | sort -V | head -n1)" = "${MIN_PDBX_MMCIF_DIC_VER}" ]; then \
+    DIC_VER="$(grep _dictionary.version ${DIC_LOC} | head -n1 | tr -s ' ' | cut -d ' ' -f2)" \
+    && echo "PDBx/mmCIF Dictionary version: ${DIC_VER}" && echo "DIC_VER=${DIC_VER}" >> /build/.ver_info; \
+    if [ "$(printf '%s\n' "${MIN_DIC_VER}" "${DIC_VER}" | sort -V | head -n1)" = "${MIN_DIC_VER}" ]; then \
     echo "Version OK"; else exit 1; fi; \
     # Update Chemical Component Dictionary (CCD)
     FILES_URL="https://files.wwpdb.org/pub/pdb/data/monomers"; \
@@ -107,8 +107,9 @@ RUN mkdir -p ${RCSBROOT}
 # Copy version information from builder
 COPY --from=builder /build/.ver_info ${RCSBROOT}
 
-# Append version information as environment variables
-RUN source ${RCSBROOT}/.ver_info && rm -f bash get date of file
+# Add version information as environment variables: MAXIT_VER, DDL_VER, DIC_VER, CCD_VER, VAR_VER
+RUN source ${RCSBROOT}/.ver_info; \
+    rm -f ${RCSBROOT}/.ver_info
 
 # Copy bin directory from builder
 COPY --from=builder /opt/bin ${RCSBROOT}/bin

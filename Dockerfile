@@ -85,6 +85,7 @@ RUN set -eux; \
     # Build MAXIT (README-source instructs to run `make` then `make binary`)
     make; \
     make binary; \
+    chmod -R 644 data/binary; \
     # Prepare an /opt tree to copy to runtime image
     mkdir -p /opt/data; \
     # Remove data/ascii directory to reduce image size

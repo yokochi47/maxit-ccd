@@ -112,16 +112,16 @@ COPY --from=builder /opt/bin ${RCSBROOT}/bin
 COPY --from=builder /opt/data/binary ${RCSBROOT}/data/binary
 
 # Copy version information from builder
-COPY --from=builder /build/.ver_info /etc/.profile
+COPY --from=builder /build/.ver_info /etc/.ver_info
+
+WORKDIR /etc
 
 # Cacatenate version information to /etc/profile
-RUN cat /etc/.profile >> /etc/profile ; rm -f /etc/.profile
+RUN cat .ver_info profile > .profile && mv .profile profile && rm -f .ver_info
 
-# Make sh act as if it had been invoked as a login shell
-SHELL ["/bin/sh", "-l", "-c"]
+ENV ENV=/etc/profile
 
-ENV ENV=/root/.shinit
-RUN cat /etc/profile >> /root/.shinit ; export ENV
+RUN export ENV
 
 # Create non-root user
 RUN addgroup -S webmaster && \
@@ -135,9 +135,6 @@ RUN chown -R webmaster:webmaster /data
 
 # Switch to no-root user
 USER webmaster
-
-ENV ENV=~/.shinit
-RUN cat /etc/profile >> ~/.shinit ; export ENV
 
 # Ensure the shell is interactive to load the profile
 CMD ["/bin/sh", "-i", "-c"]

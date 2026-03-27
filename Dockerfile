@@ -122,7 +122,7 @@ ENV ENV=/root/.shinit
 
 # Create the .shinit file with aliases and environment variables
 RUN echo 'alias ll="ls -lFa"' > /root/.shinit \
-    && cat /opt/.ver_info >> /root/.shinit \
+    && cat /opt/.ver_info >> /root/.shinit; \
     rm -f /opt/.ver_info
 
 # Add ${RCSBROOT}/bin to PATH

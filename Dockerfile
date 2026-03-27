@@ -112,26 +112,18 @@ COPY --from=builder /opt/bin ${RCSBROOT}/bin
 COPY --from=builder /opt/data/binary ${RCSBROOT}/data/binary
 
 # Copy version information from builder
-COPY --from=builder /build/.ver_info /etc/.ver_info
+COPY --from=builder /build/.ver_info /opt/.ver_info
 
-RUN ENV=/etc/.ver_info; export ENV
-
-# Create non-root user
-RUN addgroup -S webmaster && \
-    adduser -S webmaster -G webmaster -D
-
-# Set working directory
-WORKDIR /data
-
-# Change the ownership of the working directory to the non-root user
-RUN chown -R webmaster:webmaster /data
-
-SHELL ["/bin/sh", "-l", "-c"]
+# Create entrypoint script executable
+RUN echo "#!/bin/sh" > /opt/entrypoint.sh && \
+    echo "set -e" >> /opt/entrypoint.sh && \
+    cat /opt/.ver_info >> /opt/entrypoint.sh && \
+    echo 'exec "$@"' >> /opt/entrypoint.sh && \
+    chmod +x /opt/entrypoint.sh && \
+    rm -f /opt/.ver_info
 
 # Switch to no-root user
 USER webmaster
 
-RUN echo -e "User : $(whoami)\nEnv  : $MAXIT_VER"
-
-# Ensure the shell is interactive to load the profile
-CMD ["/bin/sh", "-i", "-c"]
+# Set the entrypoint
+ENTRYPOINT ["/opt/entrypoint.sh"]

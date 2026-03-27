@@ -114,15 +114,19 @@ WORKDIR /data
 # Copy version information from builder
 COPY --from=builder /build/.ver_info /opt/.ver_info
 
+# Ensure the shell is interactive to load the profile
+SHELL ["/bin/sh", "-i", "-c"]
+
 # Define the environment file
 ENV ENV=/root/.shinit
 
 # Create the .shinit file with aliases and environment variables
-RUN cat /opt/.ver_info > /root/.shinit && \
+RUN echo 'alias ll="ls -lFa"' > /root/.shinit \
+    && cat /opt/.ver_info >> /root/.shinit \
     rm -f /opt/.ver_info
 
 # Add ${RCSBROOT}/bin to PATH
 ENV PATH="$PATH:${RCSBROOT}/bin"
 
 # Ensure the shell is interactive to load the profile
-CMD ["/bin/ash", "-i"]
+CMD ["/bin/sh", "-i", "-c"]

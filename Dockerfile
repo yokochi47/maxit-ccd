@@ -70,7 +70,7 @@ RUN set -eux; \
     COMPONENTS_LOC="${ASCII_DIR}/component.cif"; \
     echo "Downloading ${COMPONENTS_URL} ..."; \
     wget -q "${COMPONENTS_URL}" \
-    && echo "CCD_VER=""$(date -r ${COMPONENTS_TARBALL} +'%Y-%m-%d')" >> /build/.ver_info \
+    && echo "CCD_REL=""$(date -r ${COMPONENTS_TARBALL} +'%Y-%m-%d')" >> /build/.ver_info \
     && gzip -d "${COMPONENTS_TARBALL}" -c > "${COMPONENTS_LOC}" \
     && rm "${COMPONENTS_TARBALL}"; \
     # Update Protonation Variants Companion Dictionary
@@ -79,7 +79,7 @@ RUN set -eux; \
     VARIANTS_LOC="${ASCII_DIR}/variant.cif"; \
     echo "Downloading ${VARIANTS_URL} ..."; \
     wget -q "${VARIANTS_URL}" \
-    && echo "VAR_VER=""$(date -r ${VARIANTS_TARBALL} +'%Y-%m-%d')" >> /build/.ver_info \
+    && echo "VAR_REL=""$(date -r ${VARIANTS_TARBALL} +'%Y-%m-%d')" >> /build/.ver_info \
     && gzip -d "${VARIANTS_TARBALL}" -c > "${VARIANTS_LOC}" \
     && rm "${VARIANTS_TARBALL}"; \
     # Build MAXIT (README-source instructs to run `make` then `make binary`)
@@ -104,12 +104,14 @@ ENV RCSBROOT=/opt/maxit
 # Create installation directory
 RUN mkdir -p ${RCSBROOT}
 
-# Copy version information from builder
+# Copy version information from builder and set environment variables: MAXIT_VER, DDL_VER, DIC_VER, CCD_REL, and VAR_REL
 COPY --from=builder /build/.ver_info ${RCSBROOT}
-
-# Add version information as environment variables: MAXIT_VER, DDL_VER, DIC_VER, CCD_VER, VAR_VER
-RUN source ${RCSBROOT}/.ver_info && export MAXIT_VER && export DDL_VER && export DIC_VER && export CCD_VER && export VAR_VER; \
-    rm -f ${RCSBROOT}/.ver_info
+RUN source ${RCSBROOT}/.ver_info && rm -f ${RCSBROOT}/.ver_info
+ENV MAXIT_VER=${MAXIT_VER}
+ENV DDL_VER=${DDL_VER}
+ENV DIC_VER=${DIC_VER}
+ENV CCD_REL=${CCD_REL}
+ENV VAR_REL=${VAR_REL}
 
 # Copy bin directory from builder
 COPY --from=builder /opt/bin ${RCSBROOT}/bin

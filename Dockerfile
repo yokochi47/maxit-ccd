@@ -122,6 +122,10 @@ RUN echo "#!/bin/sh" > /opt/entrypoint.sh && \
     chmod +x /opt/entrypoint.sh && \
     rm -f /opt/.ver_info
 
+# Create non-root user
+RUN addgroup -S webmaster && \
+    adduser -S webmaster -G webmaster -D
+
 # Switch to no-root user
 USER webmaster
 

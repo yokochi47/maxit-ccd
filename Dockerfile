@@ -24,7 +24,7 @@ WORKDIR /build
 RUN set -eux; \
     # Get version (e.g. "11.400") from RCSB
     MAXIT_VER="$(wget -qO- https://sw-tools.rcsb.org/apps/MAXIT/maxit-latest-version.txt)" \
-    && echo "MAXIT version: ${MAXIT_VER}" && echo "MAXIT_VER=${MAXIT_VER}" > /build/.ver_info; \
+    && echo "MAXIT version: ${MAXIT_VER}" && echo "export MAXIT_VER=${MAXIT_VER}" > /build/.ver_info; \
     if [ "$(printf '%s\n' "${MIN_MAXIT_VER}" "${MAXIT_VER}" | sort -V | head -n1)" = "${MIN_MAXIT_VER}" ]; then \
     echo "Version OK"; else exit 1; fi; \
     TARBALL="maxit-v${MAXIT_VER}-prod-src.tar.gz"; \
@@ -48,7 +48,7 @@ RUN set -eux; \
     && gzip -d "${DDL_TARBALL}" -c > "${DDL_LOC}" \
     && rm "${DDL_TARBALL}"; \
     DDL_VER="$(grep _dictionary.version ${DDL_LOC} | head -n1 | tr -s ' ' | cut -d ' ' -f2)" \
-    && echo "Dectionary Description Language (DDL) version: ${DDL_VER}" && echo "DDL_VER=${DDL_VER}" >> /build/.ver_info; \
+    && echo "Dectionary Description Language (DDL) version: ${DDL_VER}" && echo "export DDL_VER=${DDL_VER}" >> /build/.ver_info; \
     if [ "$(printf '%s\n' "${MIN_DDL_VER}" "${DDL_VER}" | sort -V | head -n1)" = "${MIN_DDL_VER}" ]; then \
     echo "Version OK"; else exit 1; fi; \
     # Update PDBx/mmCIF Dictionary
@@ -60,7 +60,7 @@ RUN set -eux; \
     && gzip -d "${DIC_TARBALL}" -c > "${DIC_LOC}" \
     && rm "${DIC_TARBALL}"; \
     DIC_VER="$(grep _dictionary.version ${DIC_LOC} | head -n1 | tr -s ' ' | cut -d ' ' -f2)" \
-    && echo "PDBx/mmCIF Dictionary version: ${DIC_VER}" && echo "DIC_VER=${DIC_VER}" >> /build/.ver_info; \
+    && echo "PDBx/mmCIF Dictionary version: ${DIC_VER}" && echo "export DIC_VER=${DIC_VER}" >> /build/.ver_info; \
     if [ "$(printf '%s\n' "${MIN_DIC_VER}" "${DIC_VER}" | sort -V | head -n1)" = "${MIN_DIC_VER}" ]; then \
     echo "Version OK"; else exit 1; fi; \
     # Update Chemical Component Dictionary (CCD)
@@ -70,7 +70,7 @@ RUN set -eux; \
     COMPONENTS_LOC="${ASCII_DIR}/component.cif"; \
     echo "Downloading ${COMPONENTS_URL} ..."; \
     wget -q "${COMPONENTS_URL}" \
-    && echo "CCD_REL=""$(date -r ${COMPONENTS_TARBALL} +'%Y-%m-%d')" >> /build/.ver_info \
+    && echo "export CCD_REL=""$(date -r ${COMPONENTS_TARBALL} +'%Y-%m-%d')" >> /build/.ver_info \
     && gzip -d "${COMPONENTS_TARBALL}" -c > "${COMPONENTS_LOC}" \
     && rm "${COMPONENTS_TARBALL}"; \
     # Update Protonation Variants Companion Dictionary
@@ -79,7 +79,7 @@ RUN set -eux; \
     VARIANTS_LOC="${ASCII_DIR}/variant.cif"; \
     echo "Downloading ${VARIANTS_URL} ..."; \
     wget -q "${VARIANTS_URL}" \
-    && echo "VAR_REL=""$(date -r ${VARIANTS_TARBALL} +'%Y-%m-%d')" >> /build/.ver_info \
+    && echo "export VAR_REL=""$(date -r ${VARIANTS_TARBALL} +'%Y-%m-%d')" >> /build/.ver_info \
     && gzip -d "${VARIANTS_TARBALL}" -c > "${VARIANTS_LOC}" \
     && rm "${VARIANTS_TARBALL}"; \
     # Build MAXIT (README-source instructs to run `make` then `make binary`)
@@ -118,8 +118,7 @@ COPY --from=builder /build/.ver_info /opt/.ver_info
 ENV ENV=/root/.shinit
 
 # Create the .shinit file with aliases and environment variables
-RUN echo 'alias ll="ls -alF"' > /root/.shinit && \
-    cat /opt/.ver_info >> /root/.shinit && \
+RUN cat /opt/.ver_info > /root/.shinit && \
     rm -f /opt/.ver_info
 
 # Add ${RCSBROOT}/bin to PATH

@@ -108,21 +108,22 @@ COPY --from=builder /opt/bin ${RCSBROOT}/bin
 # Copy data/binary directory from builder
 COPY --from=builder /opt/data/binary ${RCSBROOT}/data/binary
 
-# Add ${RCSBROOT}/bin to PATH
-ENV PATH="$PATH:${RCSBROOT}/bin"
-
 # Set working directory
 WORKDIR /data
 
 # Copy version information from builder
 COPY --from=builder /build/.ver_info /opt/.ver_info
 
-# Create entrypoint.sh with setting environment variables: MAXIT_VER, DDL_VER, DIC_VER, CCD_REL, and VAR_REL
-RUN echo '#!/bin/bash' > /opt/entrypoint.sh && \
-    echo 'set -e' >> /opt/entrypoint.sh && \
-    echo 'source /opt/.ver_info' >> /opt/entrypoint.sh && \
-    echo 'exec "$@"' >> /opt/entrypoint.sh && \
-    chmod +x /opt/entrypoint.sh
+# Define the environment file
+ENV ENV=/root/.shinit
 
-# Set the entrypoint
-ENTRYPOINT ["/opt/entrypoint.sh"]
+# Create the .shinit file with aliases and environment variables
+RUN echo 'alias ll="ls -alF"' > /root/.shinit && \
+    cat /opt/.ver_info >> /root/.shinit && \
+    rm -f /opt/.ver_info
+
+# Add ${RCSBROOT}/bin to PATH
+ENV PATH="$PATH:${RCSBROOT}/bin"
+
+# Ensure the shell is interactive to load the profile
+CMD ["/bin/ash", "-i"]

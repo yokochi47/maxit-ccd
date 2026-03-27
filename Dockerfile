@@ -87,8 +87,6 @@ RUN set -eux; \
     make binary; \
     # Prepare an /opt tree to copy to runtime image
     mkdir -p /opt/data; \
-    # Remove unnecessary executable files in bin directory
-    rm -f bin/generate_assembly_cif_file bin/process_entry; \
     # Remove data/ascii directory to reduce image size
     rm -rf data/ascii; \
     # Copy application with its resource in the /opt tree
@@ -104,23 +102,27 @@ ENV RCSBROOT=/opt/maxit
 # Create installation directory
 RUN mkdir -p ${RCSBROOT}
 
-# Copy version information from builder and set environment variables: MAXIT_VER, DDL_VER, DIC_VER, CCD_REL, and VAR_REL
-COPY --from=builder /build/.ver_info ${RCSBROOT}
-RUN source ${RCSBROOT}/.ver_info && rm -f ${RCSBROOT}/.ver_info
-ENV MAXIT_VER=${MAXIT_VER}
-ENV DDL_VER=${DDL_VER}
-ENV DIC_VER=${DIC_VER}
-ENV CCD_REL=${CCD_REL}
-ENV VAR_REL=${VAR_REL}
-
 # Copy bin directory from builder
 COPY --from=builder /opt/bin ${RCSBROOT}/bin
 
 # Copy data/binary directory from builder
 COPY --from=builder /opt/data/binary ${RCSBROOT}/data/binary
 
+# Add ${RCSBROOT}/bin to PATH
+ENV PATH="$PATH:${RCSBROOT}/bin"
+
 # Set working directory
 WORKDIR /data
 
-# Set entrypoint
-ENTRYPOINT ["/opt/maxit/bin/maxit"]
+# Copy version information from builder
+COPY --from=builder /build/.ver_info /opt/.ver_info
+
+# Create entrypoint.sh with setting environment variables: MAXIT_VER, DDL_VER, DIC_VER, CCD_REL, and VAR_REL
+RUN echo '#!/bin/sh' > /opt/entrypoint.sh && \
+    echo 'set -e' >> /opt/entrypoint.sh && \
+    echo 'source /opt/.ver_info' >> /opt/entrypoint.sh && \
+    echo 'exec "$@"' >> /opt/entrypoint.sh && \
+    chmod +x /opt/entrypoint.sh
+
+# Set the entrypoint
+ENTRYPOINT ["/opt/entrypoint.sh"]

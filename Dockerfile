@@ -118,7 +118,7 @@ WORKDIR /data
 COPY --from=builder /build/.ver_info /opt/.ver_info
 
 # Create entrypoint.sh with setting environment variables: MAXIT_VER, DDL_VER, DIC_VER, CCD_REL, and VAR_REL
-RUN echo '#!/bin/sh' > /opt/entrypoint.sh && \
+RUN echo '#!/bin/bash' > /opt/entrypoint.sh && \
     echo 'set -e' >> /opt/entrypoint.sh && \
     echo 'source /opt/.ver_info' >> /opt/entrypoint.sh && \
     echo 'exec "$@"' >> /opt/entrypoint.sh && \

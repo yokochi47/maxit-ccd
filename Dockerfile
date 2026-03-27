@@ -121,9 +121,9 @@ SHELL ["/bin/sh", "-l", "-c"]
 ENV ENV=/root/.shinit
 
 # Copy version information from builder
-COPY --from=builder /build/.ver_info /opt/.shinit
+COPY --from=builder /build/.ver_info /etc/profine
 
-RUN cat /opt/.shinit >> ~/.shinit
+RUN cat /etc/profile >> ~/.shinit
 
 # Create non-root user
 RUN addgroup -S webmaster && \
@@ -138,7 +138,7 @@ RUN chown -R webmaster:webmaster /data
 # Switch to no-root user
 USER webmaster
 
-RUN cat /opt/.shinit >> ~/.shinit && rm -f /opt/.shinit
+RUN cat /etc/profile >> ~/.shinit
 
 # Ensure the shell is interactive to load the profile
 CMD ["/bin/sh", "-i", "-c"]

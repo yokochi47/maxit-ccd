@@ -3,7 +3,7 @@ FROM alpine:latest AS builder
 
 ARG MIN_MAXIT_VER=11.400
 ARG MIN_DDL_VER=2.3.3
-ARG DIC_VER=5.412
+ARG MIN_DIC_VER=5.412
 
 # Install tools needed to build MAXIT
 RUN apk add --no-cache \

@@ -124,7 +124,7 @@ RUN echo "#!/bin/sh" > /opt/entrypoint.sh && \
     rm -f /opt/.ver_info
 
 # Set working directory
-WORKDIR /data
+WORKDIR /mnt
 
 # Set the entrypoint
 ENTRYPOINT ["/opt/entrypoint.sh"]

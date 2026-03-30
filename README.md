@@ -17,7 +17,7 @@ MAXIT_VER=11.400     # MAXIT version
 DDL_VER=2.3.3        # Dictionary Descrition Language (DDL) version
 DIC_VER=5.412        # PDBx/mmCIF Dictionary version
 CCD_REL=2026-03-21   # Chemical Component Dictionary (CCD) release date 
-VAR_REL=2025-09-21   # Variants Companion Dictionary release date
+VAR_REL=2025-09-21   # Amino Acid Protonation Variants Companion Dictionary release date
 ...
 ```
 

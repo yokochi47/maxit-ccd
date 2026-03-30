@@ -1,5 +1,5 @@
 # maxit-ccd
-A Docker image repository for [MAXIT](https://sw-tools.rcsb.org/apps/MAXIT/), containing regularly updated wwPDB's resources, in particular [PDBx/mmCIF Dictionary](https://mmcif.wwpdb.org/) and [Chemical Component Dictionary (CCD)](https://www.wwpdb.org/data/ccd). The Docker container will be published on every Wednesday (03:10~ UTC) and deployed to the self-hosted servers.
+A Docker image repository for [MAXIT](https://sw-tools.rcsb.org/apps/MAXIT/), combining regularly updated wwPDB's resources, in particular [PDBx/mmCIF Dictionary](https://mmcif.wwpdb.org/) and [Chemical Component Dictionary (CCD)](https://www.wwpdb.org/data/ccd). Using GitHub Actions workflow, the Docker container will be published on every Wednesday (03:10~ UTC) and deployed to the self-hosted servers.
 
 ## Usage
 
@@ -40,12 +40,12 @@ Next, prepare an arbitrary directory named `tmp` on the host machine to save the
     └── input.cif
 </pre>
 
-To mount a `tmp` directory under a predefined working directory `data` on a container machine, use the `docker run -v` option.
+To mount a `tmp` directory under a predefined working directory `mnt` on a container machine, use the `docker run -v` option.
 ```shell
-docker run -v ./tmp:/data/tmp ghcr.io/yokochi47/maxit-ccd:main maxit -input tmp/input.cif -output tmp/output.cif -o 8 -log tmp/maxit.log
+docker run -v ./tmp:/mnt/tmp ghcr.io/yokochi47/maxit-ccd:main maxit -input tmp/input.cif -output tmp/output.cif -o 8 -log tmp/maxit.log
 ```
 
-Finally, the output files `output.cif` and `maxit.log` will be created in the `tmp` directory. Conguraturation! :tada:
+Finally, the output files `output.cif` and `maxit.log` will be created in the `tmp` directory. Conguraturations! :tada:
 <pre>
 .
 └── tmp
@@ -57,5 +57,12 @@ Finally, the output files `output.cif` and `maxit.log` will be created in the `t
 ### MAXIT's memory leak countermeasures
 To ensure a safe conversion, it is recommended to set memory limit (e.g., 16GB, no swap). This will prevent excessive memory usage when converting malformed PDB files.
 ```shell
-docker run -v ./tmp:/data/tmp -m 16g --memory-swap 16g ghcr.io/yokochi47/maxit-ccd:main maxit -input tmp/input.pdb -output tmp/output.cif -o 1 -log tmp/maxit.log
+docker run -v ./tmp:/mnt/tmp -m 16g --memory-swap 16g ghcr.io/yokochi47/maxit-ccd:main maxit -input tmp/input.pdb -output tmp/output.cif -o 1 -log tmp/maxit.log
+```
+
+### Optional: Build container image
+You can build and run the maxit-ccd container image locally.
+```shell
+docker build -t maxit-ccd .
+docker run maxit-ccd:latest maxit
 ```

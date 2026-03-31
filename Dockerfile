@@ -126,5 +126,12 @@ RUN echo "#!/bin/sh" > /opt/entrypoint.sh && \
 # Set working directory
 WORKDIR /mnt
 
+# Create non-root user
+RUN addgroup -S appuser && \
+    adduser -S appuser -G appuser -D
+
+# Switch to no-root user
+USER appuser
+
 # Set the entrypoint
 ENTRYPOINT ["/opt/entrypoint.sh"]

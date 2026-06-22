@@ -89,10 +89,10 @@ RUN set -eux; \
     # Prepare an /opt tree to copy to runtime image
     mkdir -p /opt/data; \
     # Remove data/ascii directory to reduce image size
-    rm -rf data/ascii; \
+    rm -f "${DDL_LOC}" "${DIC_LOC}" "${COMPONENTS_LOC}" "${VARIANTS_LOC}"; \
     # Copy application with its resource in the /opt tree
     cp -a bin /opt/; \
-    cp -a data/binary /opt/data/
+    cp -a data /opt/
 
 # ---- runtime stage: minimal Alpine with compiled MAXIT installed ----
 FROM alpine:latest
@@ -109,8 +109,8 @@ ENV PATH="$PATH:${RCSBROOT}/bin"
 # Copy bin directory from builder
 COPY --from=builder /opt/bin ${RCSBROOT}/bin
 
-# Copy data/binary directory from builder
-COPY --from=builder /opt/data/binary ${RCSBROOT}/data/binary
+# Copy data directory from builder
+COPY --from=builder /opt/data ${RCSBROOT}/data
 
 # Copy version information from builder
 COPY --from=builder /build/.ver_info /opt/.ver_info

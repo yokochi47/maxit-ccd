@@ -19,12 +19,15 @@ RUN apk add --no-cache \
 # Set working directory
 WORKDIR /build
 
+# System version information holder file
+ENV VER_INFO=/opt/.ver_info
+
 # Fetch the "latest version" marker, download corresponding tarball, extract and build.
 # The RCSB site provides 'maxit-latest-version.txt' with the version string (e.g. "11.400").
 RUN set -eux; \
     # Get version (e.g. "11.400") from RCSB
     MAXIT_VER="$(wget -qO- https://sw-tools.rcsb.org/apps/MAXIT/maxit-latest-version.txt)" \
-    && echo "MAXIT version: ${MAXIT_VER}" && echo "export MAXIT_VER=${MAXIT_VER}" > /build/.ver_info; \
+    && echo "MAXIT version: ${MAXIT_VER}" && echo "export MAXIT_VER=${MAXIT_VER}" > ${VER_INFO}; \
     if [ "$(printf '%s\n' "${MIN_MAXIT_VER}" "${MAXIT_VER}" | sort -V | head -n1)" = "${MIN_MAXIT_VER}" ]; then \
     echo "Version OK"; else exit 1; fi; \
     TARBALL="maxit-v${MAXIT_VER}-prod-src.tar.gz"; \
@@ -48,7 +51,7 @@ RUN set -eux; \
     && gzip -d "${DDL_TARBALL}" -c > "${DDL_LOC}" \
     && rm "${DDL_TARBALL}"; \
     DDL_VER="$(grep _dictionary.version ${DDL_LOC} | head -n1 | tr -s ' ' | cut -d ' ' -f2)" \
-    && echo "Dectionary Description Language (DDL) version: ${DDL_VER}" && echo "export DDL_VER=${DDL_VER}" >> /build/.ver_info; \
+    && echo "Dectionary Description Language (DDL) version: ${DDL_VER}" && echo "export DDL_VER=${DDL_VER}" >> ${VER_INFO}; \
     if [ "$(printf '%s\n' "${MIN_DDL_VER}" "${DDL_VER}" | sort -V | head -n1)" = "${MIN_DDL_VER}" ]; then \
     echo "Version OK"; else exit 1; fi; \
     # Update PDBx/mmCIF Dictionary
@@ -60,7 +63,7 @@ RUN set -eux; \
     && gzip -d "${DIC_TARBALL}" -c > "${DIC_LOC}" \
     && rm "${DIC_TARBALL}"; \
     DIC_VER="$(grep _dictionary.version ${DIC_LOC} | head -n1 | tr -s ' ' | cut -d ' ' -f2)" \
-    && echo "PDBx/mmCIF Dictionary version: ${DIC_VER}" && echo "export DIC_VER=${DIC_VER}" >> /build/.ver_info; \
+    && echo "PDBx/mmCIF Dictionary version: ${DIC_VER}" && echo "export DIC_VER=${DIC_VER}" >> ${VER_INFO}; \
     if [ "$(printf '%s\n' "${MIN_DIC_VER}" "${DIC_VER}" | sort -V | head -n1)" = "${MIN_DIC_VER}" ]; then \
     echo "Version OK"; else exit 1; fi; \
     # Update Chemical Component Dictionary (CCD)
@@ -70,7 +73,7 @@ RUN set -eux; \
     COMPONENTS_LOC="${ASCII_DIR}/component.cif"; \
     echo "Downloading ${COMPONENTS_URL} ..."; \
     wget -q "${COMPONENTS_URL}" \
-    && echo "export CCD_REL=""$(date -r ${COMPONENTS_TARBALL} +'%Y-%m-%d')" >> /build/.ver_info \
+    && echo "export CCD_REL=""$(date -r ${COMPONENTS_TARBALL} +'%Y-%m-%d')" >> ${VER_INFO} \
     && gzip -d "${COMPONENTS_TARBALL}" -c > "${COMPONENTS_LOC}" \
     && rm "${COMPONENTS_TARBALL}"; \
     # Update Protonation Variants Companion Dictionary
@@ -79,7 +82,7 @@ RUN set -eux; \
     VARIANTS_LOC="${ASCII_DIR}/variant.cif"; \
     echo "Downloading ${VARIANTS_URL} ..."; \
     wget -q "${VARIANTS_URL}" \
-    && echo "export VAR_REL=""$(date -r ${VARIANTS_TARBALL} +'%Y-%m-%d')" >> /build/.ver_info \
+    && echo "export VAR_REL=""$(date -r ${VARIANTS_TARBALL} +'%Y-%m-%d')" >> ${VER_INFO} \
     && gzip -d "${VARIANTS_TARBALL}" -c > "${VARIANTS_LOC}" \
     && rm "${VARIANTS_TARBALL}"; \
     # Build MAXIT (README-source instructs to run `make` then `make binary`)
@@ -106,6 +109,9 @@ RUN mkdir -p ${RCSBROOT}
 # Add ${RCSBROOT}/bin to PATH
 ENV PATH="$PATH:${RCSBROOT}/bin"
 
+# System version information holder file
+ENV VER_INFO=/opt/.ver_info
+
 # Copy bin directory from builder
 COPY --from=builder /opt/bin ${RCSBROOT}/bin
 
@@ -113,15 +119,15 @@ COPY --from=builder /opt/bin ${RCSBROOT}/bin
 COPY --from=builder /opt/data ${RCSBROOT}/data
 
 # Copy version information from builder
-COPY --from=builder /build/.ver_info /opt/.ver_info
+COPY --from=builder ${VER_INFO} ${VER_INFO}
 
 # Create entrypoint script executable with exporting version information
 RUN echo "#!/bin/sh" > /opt/entrypoint.sh && \
     echo "set -e" >> /opt/entrypoint.sh && \
-    cat /opt/.ver_info >> /opt/entrypoint.sh && \
+    cat ${VER_INFO} >> /opt/entrypoint.sh && \
     echo 'exec "$@"' >> /opt/entrypoint.sh && \
     chmod +x /opt/entrypoint.sh && \
-    rm -f /opt/.ver_info
+    rm -f ${VER_INFO}
 
 # Set working directory
 WORKDIR /mnt

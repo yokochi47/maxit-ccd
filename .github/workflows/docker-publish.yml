@@ -67,6 +67,18 @@ jobs:
           echo "MIN_DDL_VER=$MIN_DDL_VER" >> $GITHUB_ENV
           echo "MIN_PDBX_MMCIF_DIC_VER=$MIN_PDBX_MMCIF_DIC_VER" >> $GITHUB_ENV
 
+      # Determine cache settings based on trigger
+      - name: Set cache configuration
+        id: cache-config
+        run: |
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            echo "cache-from=" >> $GITHUB_OUTPUT
+            echo "cache-to=" >> $GITHUB_OUTPUT
+          else
+            echo "cache-from=type=gha" >> $GITHUB_OUTPUT
+            echo "cache-to=type=gha,mode=max" >> $GITHUB_OUTPUT
+          fi
+
       # Build and push Docker image with Buildx
       # https://github.com/docker/build-push-action
       - name: Build and push Docker image

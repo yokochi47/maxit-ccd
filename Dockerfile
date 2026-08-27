@@ -3,7 +3,7 @@ FROM alpine:latest AS builder
 
 ARG MIN_MAXIT_VER=11.400
 ARG MIN_DDL_VER=2.3.3
-ARG MIN_DIC_VER=5.414
+ARG MIN_DIC_VER=5.416
 
 # Install tools needed to build MAXIT
 RUN apk add --no-cache \
@@ -73,7 +73,7 @@ RUN set -eux; \
     COMPONENTS_LOC="${ASCII_DIR}/component.cif"; \
     echo "Downloading ${COMPONENTS_URL} ..."; \
     wget -q "${COMPONENTS_URL}" \
-    && echo "export CCD_REL=""$(date -r ${COMPONENTS_TARBALL} +'%Y-%m-%d')" >> ${VER_INFO} \
+    && echo "export CCD_REL=""$(date -u -r ${COMPONENTS_TARBALL} +'%Y-%m-%d')" >> ${VER_INFO} \
     && gzip -d "${COMPONENTS_TARBALL}" -c > "${COMPONENTS_LOC}" \
     && rm "${COMPONENTS_TARBALL}"; \
     # Update Protonation Variants Companion Dictionary
@@ -82,7 +82,7 @@ RUN set -eux; \
     VARIANTS_LOC="${ASCII_DIR}/variant.cif"; \
     echo "Downloading ${VARIANTS_URL} ..."; \
     wget -q "${VARIANTS_URL}" \
-    && echo "export VAR_REL=""$(date -r ${VARIANTS_TARBALL} +'%Y-%m-%d')" >> ${VER_INFO} \
+    && echo "export VAR_REL=""$(date -u -r ${VARIANTS_TARBALL} +'%Y-%m-%d')" >> ${VER_INFO} \
     && gzip -d "${VARIANTS_TARBALL}" -c > "${VARIANTS_LOC}" \
     && rm "${VARIANTS_TARBALL}"; \
     # Build MAXIT (README-source instructs to run `make` then `make binary`)

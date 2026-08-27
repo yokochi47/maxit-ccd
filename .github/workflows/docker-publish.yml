@@ -87,8 +87,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: ${{ steps.cache-config.outputs.cache-from }}
+          cache-to: ${{ steps.cache-config.outputs.cache-to }}
           build-args: |
             MIN_MAXIT_VER=${{ env.MIN_MAXIT_VER }}
             MIN_DDL_VER=${{ env.MIN_DDL_VER }}
@@ -114,6 +114,24 @@ jobs:
       - name: Deploy to self-hosted servers
         shell: bash
         run: |
+          # Wait for image to be available with retry logic
+          max_attempts=10
+          attempt=1
+          while [ $attempt -le $max_attempts ]; do
+            if docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}; then
+              echo "Image pull successful"
+              break
+            fi
+            echo "Attempt $attempt failed, retrying in 10 seconds..."
+            sleep 10
+            ((attempt++))
+          done
+
+          if [ $attempt -gt $max_attempts ]; then
+            echo "Failed to pull image after $max_attempts attempts"
+            exit 1
+          fi
+
           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
           docker system info | grep Swarm | grep active > /dev/null || docker swarm init
           docker service ps ${{ github.event.repository.name }} > /dev/null \

@@ -127,7 +127,8 @@ RUN echo "#!/bin/sh" > /opt/entrypoint.sh && \
     cat ${VER_INFO} >> /opt/entrypoint.sh && \
     echo 'exec "$@"' >> /opt/entrypoint.sh && \
     chmod +x /opt/entrypoint.sh && \
-    rm -f ${VER_INFO}
+    rm -f ${VER_INFO} &&\
+    unset VER_INFO
 
 # Set working directory
 WORKDIR /mnt

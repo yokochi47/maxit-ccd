@@ -109,9 +109,6 @@ RUN mkdir -p ${RCSBROOT}
 # Add ${RCSBROOT}/bin to PATH
 ENV PATH="$PATH:${RCSBROOT}/bin"
 
-# System version information holder file
-ENV VER_INFO=/opt/.ver_info
-
 # Copy bin directory from builder
 COPY --from=builder /opt/bin ${RCSBROOT}/bin
 
@@ -119,16 +116,15 @@ COPY --from=builder /opt/bin ${RCSBROOT}/bin
 COPY --from=builder /opt/data ${RCSBROOT}/data
 
 # Copy version information from builder
-COPY --from=builder ${VER_INFO} ${VER_INFO}
+COPY --from=builder /opt/.ver_info /opt/.ver_info
 
 # Create entrypoint script executable with exporting version information
 RUN echo "#!/bin/sh" > /opt/entrypoint.sh && \
     echo "set -e" >> /opt/entrypoint.sh && \
-    cat ${VER_INFO} >> /opt/entrypoint.sh && \
+    cat /opt/.ver_info >> /opt/entrypoint.sh && \
     echo 'exec "$@"' >> /opt/entrypoint.sh && \
     chmod +x /opt/entrypoint.sh && \
-    rm -f ${VER_INFO} && \
-    unset VER_INFO
+    rm -f /opt/.ver_info
 
 # Set working directory
 WORKDIR /mnt

@@ -110,6 +110,8 @@ jobs:
   deploy:
     needs: build  
     runs-on: self-hosted
+    permissions:
+      contents: read
     steps:
       - name: Deploy to self-hosted servers
         shell: bash

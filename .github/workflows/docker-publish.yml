@@ -137,8 +137,8 @@ jobs:
           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
           docker system info | grep Swarm | grep active > /dev/null || docker swarm init
           docker service ps ${{ github.event.repository.name }} > /dev/null \
-            && ((docker service update --force -q --image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }} ${{ github.event.repository.name }} \
+            && ((docker service update --force -q --restart-condition on-failure --restart-max-attempts 3 --update-failure-action continue --image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }} ${{ github.event.repository.name }} \
                 || true) &) \
-            || (docker service create -q --replicas 3 --name ${{ github.event.repository.name }} --update-delay 20s ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }} &)
+            || (docker service create -q --replicas 3 --name ${{ github.event.repository.name }} --update-delay 20s --restart-condition on-failure --restart-max-attempts 3 --update-failure-action continue ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }} &)
           sleep 60 && [[ `docker images -q -f "dangling=true" ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} | wc -l` -gt 0 ]] \
             && docker rmi -f $(docker images -q -f "dangling=true" ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }})

@@ -89,6 +89,7 @@ RUN set -eux; \
     make; \
     make binary; \
     chmod -R 644 data/binary; \
+    chmod 755 data/binary; \
     # Prepare an /opt tree to copy to runtime image
     mkdir -p /opt/data; \
     # Remove data/ascii directory to reduce image size
